@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lolly Wren Companion — Interactive Physics Demonstrations</title>
+<meta name="description" content="Interactive quantum mechanics demonstrations companion to Schrödinger's Paperwork (Lolly Wren's Curious Science Adventures, Book 1) by Q.E.D.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2a2015; --paper:#f4ecd8; --paper-2:#e9ddc0; --paper-3:#ddceac;
+    --gold:#8a6415; --gold-strong:#6d4e10; --teal:#1f5c52; --teal-strong:#164943;
+    --rule:#cdb98a; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#ece0c4; --paper:#1d1710; --paper-2:#241d13; --paper-3:#2c2418;
+      --gold:#d8b34a; --gold-strong:#ecc866; --teal:#4fa093; --teal-strong:#6cbcae;
+      --rule:#4a3f2a; color-scheme: dark;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--paper); color:var(--ink); margin:0; font-family:'Lora', Georgia, serif; line-height:1.55;}
+  .wrap{max-width:880px; margin:0 auto; padding-inline:20px; padding-block:32px 60px;}
+  h1{font-family:'Playfair Display', Georgia, serif; font-size:clamp(1.7rem,5vw,2.4rem); color:var(--gold-strong); margin:0 0 10px; text-wrap:balance;}
+  .eyebrow{font-family:'Courier Prime',monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--teal-strong); margin-bottom:8px;}
+  .lede{max-width:62ch; opacity:.85; margin-bottom:30px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px;}
+  a.card{
+    display:block; border:1px solid var(--rule); background:var(--paper-2); padding:16px 18px;
+    text-decoration:none; color:var(--ink);
+  }
+  a.card:hover{border-color:var(--gold);}
+  a.card .n{font-family:'Courier Prime',monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--teal-strong);}
+  a.card h2{font-family:'Playfair Display',serif; font-size:1.05rem; margin:6px 0 6px; color:var(--gold-strong);}
+  a.card p{font-size:.85rem; opacity:.8; margin:0;}
+  footer{margin-top:40px; border-top:3px double var(--rule); padding-top:16px; font-size:.85rem; opacity:.8;}
+  footer .closing{font-family:'Playfair Display',serif; font-style:italic; color:var(--gold-strong); font-size:1.05rem; margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Lolly Wren's Curious Science Adventures</div>
+  <h1>Companion Demonstrations</h1>
+  <p class="lede">Eleven interactive quantum mechanics demonstrations, built to go with <em>Schrödinger's Paperwork</em> (Book&nbsp;1). Each one dramatizes a real concept from the book's Physics Notes — no sign-in, no account, just open and play.</p>
+
+  <div class="grid">
+    <a class="card" href="twoslits.html"><span class="n">Note 01</span><h2>Two Slits, One Question</h2><p>Fire electrons through a double slit and watch interference vanish the moment you look.</p></a>
+    <a class="card" href="blochsphere.html"><span class="n">Note 01</span><h2>The Qubit's Sphere</h2><p>Manipulate a superposition directly on the Bloch sphere.</p></a>
+    <a class="card" href="glasstrick.html"><span class="n">Note 01–02</span><h2>Feynman's Glass Trick</h2><p>QED's "sum over paths," demonstrated through light reflecting off glass.</p></a>
+    <a class="card" href="cat.html"><span class="n">Note 02</span><h2>The Cat in the Box</h2><p>The book's namesake thought experiment, playable.</p></a>
+    <a class="card" href="zeno.html"><span class="n">Note 03–04</span><h2>A Watched Pot</h2><p>Watch continuous observation freeze a quantum system in real time.</p></a>
+    <a class="card" href="tunneling.html"><span class="n">Note 06 (bonus)</span><h2>Through the Wall</h2><p>Quantum tunneling — the mechanism behind Hawking radiation.</p></a>
+    <a class="card" href="bb84.html"><span class="n">Note 07</span><h2>Alice, Bob, and Eve</h2><p>Entanglement and quantum key distribution, playable.</p></a>
+    <a class="card" href="wigner.html"><span class="n">Note 11</span><h2>Wigner's Friend</h2><p>Play both sides of quantum mechanics' strangest paradox.</p></a>
+    <a class="card" href="bellchsh.html"><span class="n">Note 13</span><h2>Beat the Classical Limit</h2><p>Try to beat the CHSH bound yourself before quantum mechanics shows you how.</p></a>
+    <a class="card" href="confinement.html"><span class="n">Note 14 (bonus)</span><h2>Why Quarks Never Travel Alone</h2><p>Quark confinement, adjacent to the string theory notes.</p></a>
+    <a class="card" href="maxwell.html"><span class="n">Note 16–17</span><h2>Maxwell's Demon</h2><p>Sort molecules for free — until the demon's memory tape sends you the bill.</p></a>
+  </div>
+
+  <footer>
+    <div class="closing">There is no lid.</div>
+    <p>Companion demonstrations for <em>Schrödinger's Paperwork</em> by Q.E.D. (Lothar J. Musiol). All demonstrations run entirely in your browser — nothing is collected or stored.</p>
+  </footer>
+</div>
+</body>
+</html>

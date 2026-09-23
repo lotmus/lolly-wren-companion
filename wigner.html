@@ -1,0 +1,292 @@
+<title>Wigner's Friend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1ee;
+    --panel:#ffffff;
+    --panel-2:#e4e9e3;
+    --ink:#182420;
+    --muted:#5b6b63;
+    --amber:#9a6b12;
+    --green:#2f7a5c;
+    --red:#a13d34;
+    --line:#c7d0c6;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1210;
+      --panel:#161c19;
+      --panel-2:#1d2521;
+      --ink:#e7efe9;
+      --muted:#93a39a;
+      --amber:#e0ac3f;
+      --green:#5fd6a4;
+      --red:#e2685b;
+      --line:#2c3b34;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1210; --panel:#161c19; --panel-2:#1d2521; --ink:#e7efe9;
+    --muted:#93a39a; --amber:#e0ac3f; --green:#5fd6a4; --red:#e2685b; --line:#2c3b34;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink); margin:0;
+    font-family:'Courier Prime', 'Courier New', monospace;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding-inline:18px; padding-block:26px 50px;}
+  h1,h2{font-family:'Playfair Display', Georgia, serif; text-wrap:balance; margin:0;}
+  .eyebrow{font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--green); margin-bottom:6px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); color:var(--amber);}
+  .lede{max-width:60ch; color:var(--muted); font-size:.92rem; margin-top:10px; line-height:1.55; font-family: Georgia, serif;}
+
+  .stage{
+    margin-top:24px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:18px;
+  }
+  .toggle-row{
+    display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .toggle{
+    flex:1; min-width:160px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    color:var(--ink);
+    cursor:pointer;
+    font-family:'Courier Prime', monospace;
+    font-size:.82rem;
+    text-align:center;
+    letter-spacing:.03em;
+  }
+  .toggle.active{
+    border-color:var(--amber);
+    color:var(--amber);
+    font-weight:700;
+    background:transparent;
+  }
+  .toggle:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+
+  .lab{
+    position:relative;
+    border:2px solid var(--line);
+    min-height:220px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .lab.sealed::before{
+    content:"SEALED LABORATORY";
+    position:absolute; top:8px; left:8px;
+    font-size:.62rem; letter-spacing:.1em; color:var(--muted);
+  }
+  .coin{
+    width:64px; height:64px; border-radius:50%;
+    border:2px solid var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    font-size:.7rem; font-weight:700; color:var(--amber);
+    transition:transform .5s ease;
+  }
+  .coin.spinning{animation:spin 1.1s linear;}
+  @keyframes spin{
+    0%{transform:rotateY(0deg);}
+    100%{transform:rotateY(1080deg);}
+  }
+  .coin.super{
+    color:var(--muted);
+    border-style:dashed;
+    animation:shimmer 2.4s ease-in-out infinite;
+  }
+  @keyframes shimmer{
+    0%,100%{opacity:.55; border-color:var(--muted);}
+    50%{opacity:1; border-color:var(--amber);}
+  }
+  .readout{
+    font-size:.86rem;
+    color:var(--ink);
+    max-width:44ch;
+  }
+  .readout b{color:var(--amber);}
+  .btn{
+    border:1px solid var(--amber);
+    background:transparent;
+    color:var(--amber);
+    padding:9px 16px;
+    font-family:'Courier Prime', monospace;
+    font-size:.82rem;
+    cursor:pointer;
+    letter-spacing:.03em;
+  }
+  .btn:hover{background:var(--amber); color:var(--panel);}
+  .btn:disabled{opacity:.35; cursor:not-allowed; background:transparent; color:var(--amber);}
+  .btn:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+
+  .logbook{
+    margin-top:16px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width:520px){ .logbook{grid-template-columns:1fr;} }
+  .log{
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    padding:12px;
+  }
+  .log h3{
+    font-family:'Playfair Display', serif;
+    font-size:.92rem;
+    margin:0 0 6px;
+    color:var(--green);
+  }
+  .log p{margin:0; font-size:.8rem; color:var(--ink); line-height:1.5;}
+  .log .tag{font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);}
+
+  .note{
+    margin-top:22px;
+    font-size:.85rem;
+    line-height:1.6;
+    color:var(--muted);
+    font-family: Georgia, serif;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+  .note strong{color:var(--ink);}
+  [hidden]{display:none !important;}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Physics Notes &middot; Lecture 11 companion</div>
+  <h1>Wigner's Friend</h1>
+  <p class="lede">Your friend is sealed in a laboratory with a quantum coin. They flip it and read the result. From where you're standing, outside the door, what can you honestly say happened?</p>
+
+  <div class="stage">
+    <div class="toggle-row">
+      <button class="toggle active" id="btn-friend" type="button" aria-pressed="true">Friend's Logbook</button>
+      <button class="toggle" id="btn-wigner" type="button" aria-pressed="false">Wigner's Logbook (outside)</button>
+    </div>
+
+    <div class="lab sealed" id="lab">
+      <div class="coin" id="coin">?</div>
+      <div class="readout" id="readout">Nobody has flipped the coin yet. Both logbooks agree: nothing has happened.</div>
+      <button class="btn" id="flip-btn" type="button">Friend flips the coin</button>
+      <button class="btn" id="open-btn" type="button" hidden>Wigner opens the door</button>
+      <button class="btn" id="reset-btn" type="button" hidden>Reset the experiment</button>
+    </div>
+
+    <div class="logbook">
+      <div class="log">
+        <div class="tag">Friend's account</div>
+        <h3>Inside the lab</h3>
+        <p id="friend-log">"I haven't flipped anything yet."</p>
+      </div>
+      <div class="log">
+        <div class="tag">Wigner's account</div>
+        <h3>Outside the door</h3>
+        <p id="wigner-log">"Nothing in that room has a definite state yet — including my friend."</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    <strong>Why this is a genuine paradox, not a trick:</strong> the Friend's logbook is not lying. Once they read the coin, they have a definite result — heads, say — and no ordinary sense in which they are still "undecided." But standard quantum mechanics says Wigner, who has no access to the lab, must describe the friend and the coin together as one unresolved system: friend-saw-heads and friend-saw-tails, superposed, until <em>Wigner's own</em> measurement (opening the door) resolves it. Both logbooks are correct by the rules each observer is using. Nobody has ever settled whose rules are the more fundamental ones — that disagreement <em>is</em> the measurement problem, sharpened until it points at a person instead of a cat.
+  </p>
+</div>
+
+<script>
+(function(){
+  var view = 'friend'; // 'friend' | 'wigner'
+  var stage = 'unflipped'; // 'unflipped' | 'flipped' | 'opened'
+  var result = null; // 'HEADS' | 'TAILS'
+
+  var btnFriend = document.getElementById('btn-friend');
+  var btnWigner = document.getElementById('btn-wigner');
+  var lab = document.getElementById('lab');
+  var coin = document.getElementById('coin');
+  var readout = document.getElementById('readout');
+  var flipBtn = document.getElementById('flip-btn');
+  var openBtn = document.getElementById('open-btn');
+  var resetBtn = document.getElementById('reset-btn');
+  var friendLog = document.getElementById('friend-log');
+  var wignerLog = document.getElementById('wigner-log');
+
+  function render(){
+    btnFriend.classList.toggle('active', view === 'friend');
+    btnFriend.setAttribute('aria-pressed', view === 'friend');
+    btnWigner.classList.toggle('active', view === 'wigner');
+    btnWigner.setAttribute('aria-pressed', view === 'wigner');
+
+    coin.classList.remove('spinning', 'super');
+    flipBtn.hidden = true; openBtn.hidden = true; resetBtn.hidden = true;
+
+    if (stage === 'unflipped') {
+      coin.textContent = '?';
+      readout.textContent = 'Nobody has flipped the coin yet. Both logbooks agree: nothing has happened.';
+      flipBtn.hidden = false;
+      friendLog.textContent = '"I haven\'t flipped anything yet."';
+      wignerLog.textContent = '"Nothing in that room has a definite state yet — including my friend."';
+      return;
+    }
+
+    if (stage === 'flipped') {
+      if (view === 'friend') {
+        coin.textContent = result;
+        readout.innerHTML = 'You are the Friend. You flipped the coin and read it. As far as you\'re concerned, the result is <b>' + result + '</b> — plainly, definitely, done.';
+        friendLog.textContent = '"It\'s ' + result + '. I saw it myself. What else would there be to say?"';
+        wignerLog.textContent = '"I haven\'t opened the door. As far as my equations are concerned, the lab — coin, friend, logbook and all — is in a superposition of HEADS-recorded and TAILS-recorded."';
+      } else {
+        coin.classList.add('super');
+        coin.textContent = 'H/T';
+        readout.innerHTML = 'You are Wigner, outside the sealed door. Your friend has flipped the coin, but <b>you have not measured the lab</b>. Quantum mechanics obliges you to treat the entire room — coin, friend, and the result already written in their notebook — as unresolved.';
+        friendLog.textContent = '"It\'s ' + result + '. I saw it myself. What else would there be to say?"';
+        wignerLog.textContent = '"I haven\'t opened the door. As far as my equations are concerned, the lab — coin, friend, logbook and all — is in a superposition of HEADS-recorded and TAILS-recorded."';
+        openBtn.hidden = false;
+      }
+      if (view === 'friend') resetBtn.hidden = false;
+      return;
+    }
+
+    if (stage === 'opened') {
+      coin.textContent = result;
+      readout.innerHTML = 'Wigner opens the door. The superposition resolves — and it matches what the Friend wrote down all along: <b>' + result + '</b>. Nothing was ever really in doubt for the Friend. Everything was, for Wigner, until this moment.';
+      friendLog.textContent = '"It\'s ' + result + '. Told you."';
+      wignerLog.textContent = '"It\'s ' + result + '. My own measurement now agrees with what my friend already knew before I could honestly say I knew it."';
+      resetBtn.hidden = false;
+    }
+  }
+
+  btnFriend.addEventListener('click', function(){ view = 'friend'; render(); });
+  btnWigner.addEventListener('click', function(){ view = 'wigner'; render(); });
+
+  flipBtn.addEventListener('click', function(){
+    result = Math.random() < 0.5 ? 'HEADS' : 'TAILS';
+    coin.classList.add('spinning');
+    stage = 'flipped';
+    setTimeout(render, 550);
+  });
+
+  openBtn.addEventListener('click', function(){
+    stage = 'opened';
+    render();
+  });
+
+  resetBtn.addEventListener('click', function(){
+    stage = 'unflipped'; result = null; view = 'friend';
+    render();
+  });
+
+  render();
+})();
+</script>

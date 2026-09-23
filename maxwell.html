@@ -1,0 +1,277 @@
+<title>Maxwell's Demon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1ee; --panel:#ffffff; --panel-2:#e4e9e3; --ink:#182420; --muted:#5b6b63;
+    --amber:#9a6b12; --green:#2f7a5c; --red:#a13d34; --blue:#2f5f9a; --line:#c7d0c6;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1210; --panel:#161c19; --panel-2:#1d2521; --ink:#e7efe9; --muted:#93a39a;
+      --amber:#e0ac3f; --green:#5fd6a4; --red:#e2685b; --blue:#6fa8e2; --line:#2c3b34;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1210; --panel:#161c19; --panel-2:#1d2521; --ink:#e7efe9; --muted:#93a39a;
+    --amber:#e0ac3f; --green:#5fd6a4; --red:#e2685b; --blue:#6fa8e2; --line:#2c3b34;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--ink); margin:0; font-family:'Courier Prime','Courier New',monospace;}
+  .wrap{max-width:760px; margin:0 auto; padding-inline:18px; padding-block:26px 50px;}
+  h1{font-family:'Playfair Display', Georgia, serif; font-size:clamp(1.5rem,5vw,2.1rem); color:var(--amber); margin:0; text-wrap:balance;}
+  .eyebrow{font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--green); margin-bottom:6px;}
+  .lede{max-width:62ch; color:var(--muted); font-size:.92rem; margin-top:10px; line-height:1.55; font-family:Georgia, serif;}
+
+  .stage{margin-top:20px; border:1px solid var(--line); background:var(--panel); padding:16px;}
+  .canvas-box{
+    position:relative;
+    width:100%;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    overflow:hidden;
+  }
+  canvas{display:block; width:100%; height:auto; cursor:crosshair;}
+  .hint{
+    font-size:.72rem; color:var(--muted); margin-top:8px; line-height:1.5;
+  }
+
+  .stats{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width:480px){ .stats{grid-template-columns:1fr;} }
+  .stat{border:1px solid var(--line); background:var(--panel-2); padding:10px 12px;}
+  .stat .k{font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);}
+  .stat .v{font-size:1.15rem; font-variant-numeric:tabular-nums; margin-top:3px;}
+  .stat.left .v{color:var(--blue);}
+  .stat.right .v{color:var(--red);}
+
+  .tape-row{
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .tape-label{font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); white-space:nowrap;}
+  .tape{display:flex; gap:4px;}
+  .tape .slot{width:16px; height:16px; border:1px solid var(--line); background:var(--panel-2);}
+  .tape .slot.filled{background:var(--amber); border-color:var(--amber);}
+  .btn{
+    border:1px solid var(--amber); background:transparent; color:var(--amber);
+    padding:8px 14px; font-family:'Courier Prime',monospace; font-size:.78rem; cursor:pointer;
+  }
+  .btn:hover{background:var(--amber); color:var(--panel);}
+  .btn:disabled{opacity:.35; cursor:not-allowed; background:transparent; color:var(--amber);}
+  .btn:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+
+  .ledger{
+    margin-top:16px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    padding:12px;
+    font-size:.82rem;
+    line-height:1.7;
+  }
+  .ledger b{color:var(--ink);}
+  .ledger .heat{color:var(--red);}
+  .ledger .split{color:var(--green);}
+
+  .note{
+    margin-top:22px; font-size:.85rem; line-height:1.6; color:var(--muted);
+    font-family:Georgia, serif; border-top:1px solid var(--line); padding-top:16px;
+  }
+  .note strong{color:var(--ink);}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Physics Notes &middot; Lecture 16&ndash;17 companion</div>
+  <h1>Maxwell's Demon</h1>
+  <p class="lede">Two chambers, one gap, and a box of molecules moving at random speeds. Sort the fast ones right and the slow ones left, and you'll build a temperature difference from nothing at all — for as long as your memory holds out.</p>
+
+  <div class="stage">
+    <div class="canvas-box">
+      <canvas id="cv" width="640" height="320" aria-label="Particle simulation: click a molecule near the gap to sort it"></canvas>
+    </div>
+    <p class="hint">Click a molecule while it's near the gap in the middle wall to usher it through — red-hot (fast) molecules belong on the right, blue-cold (slow) ones on the left. Every sort you make is written to the demon's memory tape below.</p>
+
+    <div class="stats">
+      <div class="stat left">
+        <div class="k">Left chamber — avg. speed</div>
+        <div class="v" id="v-left">—</div>
+      </div>
+      <div class="stat right">
+        <div class="k">Right chamber — avg. speed</div>
+        <div class="v" id="v-right">—</div>
+      </div>
+    </div>
+
+    <div class="tape-row">
+      <span class="tape-label">Demon's memory tape</span>
+      <div class="tape" id="tape"></div>
+      <button class="btn" id="erase-btn" type="button">Erase tape</button>
+    </div>
+
+    <div class="ledger">
+      Temperature split you've created: <b class="split" id="split-val">0.00</b><br>
+      Heat you've released erasing memory so far: <b class="heat" id="heat-val">0</b> &times; <var>kT&nbsp;ln&nbsp;2</var><br>
+      Total sorts performed: <b id="sorts-val">0</b>
+    </div>
+  </div>
+
+  <p class="note">
+    <strong>Why the tape matters:</strong> sorting molecules by speed lowers the entropy of the gas — you've made the box more orderly for free, which the Second Law forbids. The escape clause is the demon itself: every sorting decision is a bit of information, and that information has to live somewhere (the tape above). Landauer's Principle says erasing one bit of memory costs at least <var>kT ln 2</var> of heat, released back into the world. Fill the tape and you must pay to clear it before you can sort again — and that heat is never less than what your sorting saved. The demon doesn't break the Second Law. It just moves the bill to the filing cabinet.
+  </p>
+</div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('cv');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var GAP_Y = H/2, GAP_HALF = 26;
+  var WALL_X = W/2;
+
+  var N = 26;
+  var particles = [];
+  function rand(a,b){ return a + Math.random()*(b-a); }
+
+  function makeParticle(){
+    var speed = rand(0.5, 3.4);
+    var angle = rand(0, Math.PI*2);
+    return {
+      x: rand(20, W-20),
+      y: rand(20, H-20),
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed,
+      speed: speed
+    };
+  }
+  for (var i=0;i<N;i++) particles.push(makeParticle());
+
+  var MEDIAN_SPEED = 1.95; // fast/slow threshold for correct sorting
+  var TAPE_SIZE = 8;
+  var tapeFilled = 0;
+  var heat = 0;
+  var sorts = 0;
+
+  var tapeEl = document.getElementById('tape');
+  function renderTape(){
+    tapeEl.innerHTML = '';
+    for (var i=0;i<TAPE_SIZE;i++){
+      var s = document.createElement('div');
+      s.className = 'slot' + (i < tapeFilled ? ' filled' : '');
+      tapeEl.appendChild(s);
+    }
+  }
+  renderTape();
+
+  var eraseBtn = document.getElementById('erase-btn');
+  eraseBtn.addEventListener('click', function(){
+    if (tapeFilled === 0) return;
+    heat += tapeFilled;
+    tapeFilled = 0;
+    renderTape();
+    document.getElementById('heat-val').textContent = heat;
+  });
+
+  function colorForSpeed(s){
+    var t = Math.max(0, Math.min(1, (s - 0.4) / (3.6 - 0.4)));
+    var r = Math.round(60 + t*180);
+    var b = Math.round(220 - t*180);
+    var g = Math.round(90 + (1-Math.abs(t-0.5)*2)*40);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function step(){
+    for (var i=0;i<particles.length;i++){
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+
+      if (p.y < 6){ p.y = 6; p.vy *= -1; }
+      if (p.y > H-6){ p.y = H-6; p.vy *= -1; }
+      if (p.x < 6){ p.x = 6; p.vx *= -1; }
+      if (p.x > W-6){ p.x = W-6; p.vx *= -1; }
+
+      var nearGap = Math.abs(p.y - GAP_Y) < GAP_HALF;
+      if (!nearGap){
+        if (p.x < WALL_X-4 && p.x+p.vx >= WALL_X-4){ p.x = WALL_X-4; p.vx *= -1; }
+        if (p.x > WALL_X+4 && p.x+p.vx <= WALL_X+4){ p.x = WALL_X+4; p.vx *= -1; }
+      }
+    }
+    draw();
+    requestAnimationFrame(step);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    var cs = getComputedStyle(document.documentElement);
+    var lineColor = cs.getPropertyValue('--line').trim();
+    var panelColor = cs.getPropertyValue('--panel-2').trim();
+
+    ctx.fillStyle = panelColor;
+    ctx.fillRect(0,0,W,H);
+
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(WALL_X, 0); ctx.lineTo(WALL_X, GAP_Y-GAP_HALF);
+    ctx.moveTo(WALL_X, GAP_Y+GAP_HALF); ctx.lineTo(WALL_X, H);
+    ctx.stroke();
+
+    var leftSum=0, leftN=0, rightSum=0, rightN=0;
+    for (var i=0;i<particles.length;i++){
+      var p = particles[i];
+      ctx.fillStyle = colorForSpeed(p.speed);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+      ctx.fill();
+      if (p.x < WALL_X){ leftSum += p.speed; leftN++; } else { rightSum += p.speed; rightN++; }
+    }
+    var leftAvg = leftN ? leftSum/leftN : 0;
+    var rightAvg = rightN ? rightSum/rightN : 0;
+    document.getElementById('v-left').textContent = leftAvg.toFixed(2);
+    document.getElementById('v-right').textContent = rightAvg.toFixed(2);
+    var split = rightAvg - leftAvg;
+    document.getElementById('split-val').textContent = split.toFixed(2);
+  }
+
+  canvas.addEventListener('click', function(e){
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = W / rect.width, scaleY = H / rect.height;
+    var cx = (e.clientX - rect.left) * scaleX;
+    var cy = (e.clientY - rect.top) * scaleY;
+
+    var best = null, bestD = 22;
+    for (var i=0;i<particles.length;i++){
+      var p = particles[i];
+      var d = Math.hypot(p.x-cx, p.y-cy);
+      if (d < bestD && Math.abs(p.y-GAP_Y) < GAP_HALF+10){
+        best = p; bestD = d;
+      }
+    }
+    if (!best) return;
+    if (tapeFilled >= TAPE_SIZE) return;
+
+    var wantsRight = best.speed >= MEDIAN_SPEED;
+    var correctX = wantsRight ? WALL_X + rand(20,60) : WALL_X - rand(20,60);
+    best.x = correctX;
+    best.vx = wantsRight ? Math.abs(best.vx) : -Math.abs(best.vx);
+
+    tapeFilled++;
+    sorts++;
+    renderTape();
+    document.getElementById('sorts-val').textContent = sorts;
+  });
+
+  requestAnimationFrame(step);
+})();
+</script>
