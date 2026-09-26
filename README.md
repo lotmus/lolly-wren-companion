@@ -8,7 +8,7 @@ No account required. No form to complete first. The Ministry of Eventualities wo
 
 ## What's here
 
-Eleven demonstrations, each tied to a Physics Note in the book's Appendix:
+Twelve demonstrations, each tied to a Physics Note in the book's Appendix:
 
 | Demo | Physics Note | Concept |
 |---|---|---|
@@ -16,6 +16,7 @@ Eleven demonstrations, each tied to a Physics Note in the book's Appendix:
 | [The Qubit's Sphere](https://lotmus.github.io/lolly-wren-companion/blochsphere.html) | 01 | Superposition, visualized on the Bloch sphere |
 | [Feynman's Glass Trick](https://lotmus.github.io/lolly-wren-companion/glasstrick.html) | 01–02 | Sum-over-paths, QED-style |
 | [The Cat in the Box](https://lotmus.github.io/lolly-wren-companion/cat.html) | 02 | The book's namesake thought experiment |
+| [Through a Polarizer](https://lotmus.github.io/lolly-wren-companion/polarizers.html) | 02 | Measurement basis — crossed polarizers, and the third filter that lets light back in |
 | [A Watched Pot](https://lotmus.github.io/lolly-wren-companion/zeno.html) | 03–04 | The quantum Zeno effect |
 | [Through the Wall](https://lotmus.github.io/lolly-wren-companion/tunneling.html) | 06 (bonus) | Quantum tunneling — real closed-form transmission probability, not an approximation |
 | [Alice, Bob, and Eve](https://lotmus.github.io/lolly-wren-companion/bb84.html) | 07 | Entanglement and quantum key distribution |
