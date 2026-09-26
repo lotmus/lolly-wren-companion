@@ -1,0 +1,325 @@
+<title>Through a Polarizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101418;
+    --panel:#171c22;
+    --panel-2:#1e252c;
+    --ink:#eef2f5;
+    --muted:#93a1ac;
+    --amber:#e0ac3f;
+    --green:#5fd6a4;
+    --red:#e2685b;
+    --beam:#ffd873;
+    --line:#2c3742;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f4f2ec; --panel:#ffffff; --panel-2:#eae7dd; --ink:#17140f; --muted:#5a5646;
+      --amber:#9c6d10; --green:#1f7a56; --red:#a13d1c; --beam:#c98f0f; --line:#d8d3c4;
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f4f2ec; --panel:#ffffff; --panel-2:#eae7dd; --ink:#17140f; --muted:#5a5646;
+    --amber:#9c6d10; --green:#1f7a56; --red:#a13d1c; --beam:#c98f0f; --line:#d8d3c4;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--ink); margin:0; font-family:'Courier Prime','Courier New',monospace;}
+  .wrap{max-width:920px; margin:0 auto; padding-inline:20px; padding-block:32px 60px;}
+  .eyebrow{font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--green); margin-bottom:6px;}
+  h1{font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.7rem,5vw,2.4rem); color:var(--amber); margin:0; text-wrap:balance;}
+  .lede{max-width:64ch; color:var(--muted); font-size:.92rem; margin:10px 0 28px; line-height:1.6; font-family:Georgia,serif;}
+
+  .stage{border:1px solid var(--line); background:var(--panel); padding:18px; margin-bottom:16px;}
+  canvas{display:block; width:100%; height:auto; background:radial-gradient(ellipse at 50% 40%, #05070a, #000 75%);}
+  .readout{display:flex; gap:18px; flex-wrap:wrap; font-size:.76rem; color:var(--muted); margin-top:12px;}
+  .readout b{color:var(--amber); font-variant-numeric:tabular-nums;}
+
+  .panel{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:640px){ .panel{grid-template-columns:1fr;} }
+  .card{background:var(--panel); border:1px solid var(--line); padding:16px 18px;}
+  .card h2{font-family:'Playfair Display',serif; font-size:.82rem; text-transform:uppercase; letter-spacing:.08em; font-weight:600; color:var(--muted); margin:0 0 12px;}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;}
+  .row:last-child{margin-bottom:0;}
+  .lbl{font-size:.85rem;}
+  .lbl b{color:var(--amber); font-variant-numeric:tabular-nums;}
+  input[type="range"]{width:100%; accent-color:var(--green);}
+  .toggle{width:100%; padding:10px 12px; border:1px solid var(--line); background:var(--panel-2); color:var(--ink); cursor:pointer; font-family:inherit; font-size:.82rem; letter-spacing:.03em;}
+  .toggle.active{border-color:var(--amber); color:var(--amber); font-weight:700;}
+  .toggle:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  .btn{border:1px solid var(--amber); background:transparent; color:var(--amber); padding:9px 16px; font-family:inherit; font-size:.82rem; cursor:pointer; letter-spacing:.03em; width:100%;}
+  .btn:hover{background:var(--amber); color:var(--panel);}
+  .btn:focus-visible{outline:2px solid var(--green); outline-offset:2px;}
+  .tally{display:flex; gap:16px; margin-top:10px; font-size:.8rem;}
+  .tally span b{display:block; font-size:1.3rem; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .tally .pass b{color:var(--green);}
+  .tally .block b{color:var(--red);}
+
+  footer{margin-top:26px; padding-top:18px; border-top:1px solid var(--line); font-size:.86rem; color:var(--muted); line-height:1.6; font-family:Georgia,serif;}
+  footer strong{color:var(--ink); font-family:'Courier Prime',monospace;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Physics Notes &middot; Lecture 02 companion</div>
+  <h1>Through a Polarizer</h1>
+  <p class="lede">
+    Two polarizing filters, crossed at a right angle, block every last photon &mdash; the classic
+    doorway that lets nothing through. Now slide a third filter in between them, tilted at some
+    other angle, and watch light reappear on the far side. Nothing was hidden behind the first two;
+    each filter is a measurement, and the <em>basis</em> you measure in changes what survives.
+    That is the whole content of "measurement basis," made visible.
+  </p>
+
+  <div class="stage">
+    <canvas id="scene" width="1200" height="360" role="img" aria-label="A beam of light passing through up to three polarizing filters, with an inserted middle filter at an adjustable angle."></canvas>
+    <div class="readout">
+      <span>after Polarizer A (0&deg;)&nbsp;<b id="rd-a">100.0%</b></span>
+      <span>after middle filter&nbsp;<b id="rd-b">&mdash;</b></span>
+      <span>after Polarizer C (90&deg;)&nbsp;<b id="rd-c">0.0%</b></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="card">
+      <h2>Middle Filter</h2>
+      <button class="toggle" id="btn-insert" type="button" aria-pressed="false">Insert middle filter</button>
+      <div class="row" style="margin-top:12px;">
+        <div class="lbl">Angle from Polarizer A&nbsp;<b id="val-angle">45&deg;</b></div>
+      </div>
+      <input type="range" id="slider-angle" min="0" max="90" step="1" value="45" disabled>
+    </div>
+    <div class="card">
+      <h2>Fire Single Photons</h2>
+      <button class="btn" id="btn-fire" type="button">Fire 20 photons, one at a time</button>
+      <div class="tally">
+        <span class="pass">arrived&nbsp;<b id="tally-pass">0</b></span>
+        <span class="block">absorbed&nbsp;<b id="tally-block">0</b></span>
+        <span>measured rate&nbsp;<b id="tally-rate">&mdash;</b></span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>What you're seeing:</strong> Polarizer A fixes the incoming light's polarization at 0&deg;
+    &mdash; call that the input state. Polarizer C is fixed at 90&deg;, crossed with A, so with nothing
+    between them the transmitted intensity is cos&sup2;(90&deg;) = 0. Insert a filter at angle &theta;
+    between them and two things happen in sequence: it passes cos&sup2;(&theta;) of the light through
+    (measuring the beam in <em>its own</em> basis, at angle &theta;, and only keeping the "yes" outcome),
+    and what emerges is now polarized along &theta;, not along 0&deg; &mdash; so Polarizer C sees a beam
+    already rotated toward it, and passes cos&sup2;(90&deg;&minus;&theta;) of that. Multiply the two:
+    cos&sup2;(&theta;)&middot;sin&sup2;(&theta;), maximized at &theta;=45&deg;, where a full quarter of
+    the original light gets through a gap that was, a moment ago, completely dark. The single-photon
+    mode makes the same law probabilistic: each photon independently survives each filter with exactly
+    that probability, and, over enough photons, the tally converges on the readout above it. Nothing
+    was smuggled through &mdash; the middle filter's measurement, in its own basis, is what let it in.
+  </footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var canvas = document.getElementById('scene');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var midY = H / 2;
+
+  var inserted = false;
+  var midAngleDeg = 45;
+
+  var gateA = { x: W * 0.20, angleDeg: 0 };
+  var gateB = { x: W * 0.50, angleDeg: 45 };
+  var gateC = { x: W * 0.80, angleDeg: 90 };
+
+  function cos2(deg) {
+    var r = deg * Math.PI / 180;
+    return Math.cos(r) * Math.cos(r);
+  }
+
+  function intensities() {
+    var iA = 1.0; // Polarizer A defines the input state: full transmission by construction
+    var iB, iC;
+    if (inserted) {
+      iB = iA * cos2(midAngleDeg - gateA.angleDeg);
+      iC = iB * cos2(gateC.angleDeg - midAngleDeg);
+    } else {
+      iB = null;
+      iC = iA * cos2(gateC.angleDeg - gateA.angleDeg);
+    }
+    return { iA: iA, iB: iB, iC: iC };
+  }
+
+  function updateReadouts() {
+    var v = intensities();
+    document.getElementById('rd-a').textContent = (v.iA * 100).toFixed(1) + '%';
+    document.getElementById('rd-b').textContent = inserted ? (v.iB * 100).toFixed(1) + '%' : '— (not inserted)';
+    document.getElementById('rd-c').textContent = (v.iC * 100).toFixed(1) + '%';
+  }
+
+  function drawGate(x, angleDeg, label, active) {
+    var len = 120;
+    var r = angleDeg * Math.PI / 180;
+    var dx = Math.sin(r) * len / 2;
+    var dy = -Math.cos(r) * len / 2;
+    ctx.save();
+    ctx.strokeStyle = active ? '#e0ac3f' : 'rgba(147,161,172,0.35)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x - dx, midY - dy);
+    ctx.lineTo(x + dx, midY + dy);
+    ctx.stroke();
+    ctx.fillStyle = active ? '#e0ac3f' : 'rgba(147,161,172,0.6)';
+    ctx.font = '13px "Courier Prime", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x, midY + len / 2 + 26);
+    ctx.fillText(angleDeg.toFixed(0) + '°', x, midY - len / 2 - 12);
+    ctx.restore();
+  }
+
+  function drawBeamSegment(x0, x1, intensity, hue) {
+    if (intensity === null) return;
+    var alpha = 0.12 + 0.8 * intensity;
+    var thickness = 3 + 22 * intensity;
+    var grad = ctx.createLinearGradient(x0, 0, x1, 0);
+    grad.addColorStop(0, 'rgba(255,216,115,' + alpha + ')');
+    grad.addColorStop(1, 'rgba(255,216,115,' + alpha + ')');
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,216,115,0.6)';
+    ctx.shadowBlur = 10 * intensity + 1;
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x0, midY);
+    ctx.lineTo(x1, midY);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, W, H);
+    var v = intensities();
+    drawBeamSegment(20, gateA.x, 1.0);
+    if (inserted) {
+      drawBeamSegment(gateA.x, gateB.x, v.iA);
+      drawBeamSegment(gateB.x, gateC.x, v.iB);
+    } else {
+      drawBeamSegment(gateA.x, gateC.x, v.iA);
+    }
+    drawBeamSegment(gateC.x, W - 20, v.iC);
+    drawGate(gateA.x, gateA.angleDeg, 'A (fixed)', true);
+    if (inserted) drawGate(gateB.x, midAngleDeg, 'middle', true);
+    drawGate(gateC.x, gateC.angleDeg, 'C (fixed)', true);
+  }
+
+  // --- single-photon trial mode ---
+  var photons = [];
+  var tallyPass = 0, tallyBlock = 0;
+  var firing = false;
+
+  function spawnPhoton() {
+    photons.push({ x: 20, absorbedAt: null, resolved: {} });
+  }
+
+  function photonSurvives(gateAngle, stateAngle) {
+    return Math.random() < cos2(gateAngle - stateAngle);
+  }
+
+  function stepPhotons() {
+    for (var i = photons.length - 1; i >= 0; i--) {
+      var p = photons[i];
+      if (p.absorbedAt !== null) { photons.splice(i, 1); continue; }
+      p.x += 9;
+      if (!p.resolved.A && p.x >= gateA.x) {
+        p.resolved.A = true; p.state = gateA.angleDeg;
+      }
+      if (inserted && !p.resolved.B && p.x >= gateB.x) {
+        p.resolved.B = true;
+        if (!photonSurvives(midAngleDeg, p.state)) { p.absorbedAt = gateB.x; tallyBlock++; updateTally(); continue; }
+        p.state = midAngleDeg;
+      }
+      if (!p.resolved.C && p.x >= gateC.x) {
+        p.resolved.C = true;
+        if (!photonSurvives(gateC.angleDeg, p.state)) { p.absorbedAt = gateC.x; tallyBlock++; updateTally(); continue; }
+      }
+      if (p.x > W - 10) { tallyPass++; updateTally(); photons.splice(i, 1); }
+    }
+  }
+
+  function drawPhotons() {
+    for (var i = 0; i < photons.length; i++) {
+      var p = photons[i];
+      var x = p.absorbedAt !== null ? p.absorbedAt : p.x;
+      ctx.save();
+      ctx.fillStyle = p.absorbedAt !== null ? '#e2685b' : '#fff3cf';
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(x, midY, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function updateTally() {
+    document.getElementById('tally-pass').textContent = tallyPass.toString();
+    document.getElementById('tally-block').textContent = tallyBlock.toString();
+    var total = tallyPass + tallyBlock;
+    document.getElementById('tally-rate').textContent = total > 0 ? (100 * tallyPass / total).toFixed(1) + '%' : '—';
+  }
+
+  var queued = 0;
+  var spawnClock = 0;
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    var v = intensities();
+    drawBeamSegment(20, gateA.x, 1.0);
+    if (inserted) {
+      drawBeamSegment(gateA.x, gateB.x, v.iA);
+      drawBeamSegment(gateB.x, gateC.x, v.iB);
+    } else {
+      drawBeamSegment(gateA.x, gateC.x, v.iA);
+    }
+    drawBeamSegment(gateC.x, W - 20, v.iC);
+    drawGate(gateA.x, gateA.angleDeg, 'A (fixed)', true);
+    if (inserted) drawGate(gateB.x, midAngleDeg, 'middle', true);
+    drawGate(gateC.x, gateC.angleDeg, 'C (fixed)', true);
+
+    if (queued > 0) {
+      spawnClock++;
+      if (spawnClock >= 14) { spawnClock = 0; spawnPhoton(); queued--; }
+    }
+    stepPhotons();
+    drawPhotons();
+    requestAnimationFrame(frame);
+  }
+
+  document.getElementById('btn-insert').addEventListener('click', function () {
+    inserted = !inserted;
+    this.classList.toggle('active', inserted);
+    this.setAttribute('aria-pressed', inserted);
+    this.textContent = inserted ? 'Remove middle filter' : 'Insert middle filter';
+    document.getElementById('slider-angle').disabled = !inserted;
+    updateReadouts();
+  });
+
+  document.getElementById('slider-angle').addEventListener('input', function () {
+    midAngleDeg = parseFloat(this.value);
+    document.getElementById('val-angle').textContent = midAngleDeg.toFixed(0) + '°';
+    updateReadouts();
+  });
+
+  document.getElementById('btn-fire').addEventListener('click', function () {
+    queued += 20;
+  });
+
+  updateReadouts();
+  requestAnimationFrame(frame);
+})();
+</script>
